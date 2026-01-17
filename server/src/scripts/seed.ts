@@ -2,7 +2,8 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import { Expense } from '../models/Expense.js';
 
-dotenv.config({ path: '../.env' });
+// Use server/.env (default cwd when running via npm --prefix server)
+dotenv.config({ path: './.env' });
 
 const CATEGORIES = [
   '食費',

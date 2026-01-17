@@ -36,6 +36,49 @@
 ```
 
 ## セットアップ
+## 動作環境
+
+- OS: macOS 13+/Windows 10+/Ubuntu 22.04+（x64/ARM64）
+- Node.js: 18.x 推奨（例: nvm を利用する場合は `nvm use 18`）
+- npm: 9 以上（Node 18 同梱）
+- Docker Desktop: 最新版（Compose v2 同梱）
+   - インストール: https://www.docker.com/products/docker-desktop/
+- Git: 2.30 以上
+
+
+### Quick Start（最短手順）
+
+```bash
+# 1) クローン & 依存インストール
+git clone https://github.com/fermentedsoybean7110/react_sample_app.git pocket-insight
+cd pocket-insight
+npm run install:all
+
+# 2) 環境変数作成（DockerのMongoは認証あり）
+cat > server/.env << 'EOF'
+MONGO_URI=mongodb://admin:password@localhost:27017/pocket_insight?authSource=admin
+PORT=5001
+CORS_ORIGIN=http://localhost:5173
+NODE_ENV=development
+EOF
+
+cat > client/.env << 'EOF'
+VITE_API_URL=http://localhost:5001/api
+EOF
+
+# 3) MongoDB 起動（バックグラウンド）
+docker-compose up -d
+
+# 4) 開発サーバ起動
+npm run dev
+
+# 5) サンプルデータ投入（任意）
+npm run seed
+```
+
+アクセス:
+- フロントエンド: http://localhost:5173
+- バックエンド: http://localhost:5001/api/health
 
 ### 前提条件
 - Node.js v18 以上
@@ -56,12 +99,17 @@ npm run install:all
 ### .env ファイル設定
 
 ```bash
-# server/.env ファイルを作成
+# server/.env ファイルを作成（DockerのMongoは認証あり・ポート5001を使用）
 cat > server/.env << 'EOF'
-MONGO_URI=mongodb://localhost:27017/pocket_insight
-PORT=5000
+MONGO_URI=mongodb://admin:password@localhost:27017/pocket_insight?authSource=admin
+PORT=5001
 CORS_ORIGIN=http://localhost:5173
 NODE_ENV=development
+EOF
+
+# client/.env を作成（APIのURLを上書き可能）
+cat > client/.env << 'EOF'
+VITE_API_URL=http://localhost:5001/api
 EOF
 ```
 
@@ -70,7 +118,7 @@ EOF
 ### 1. MongoDB を起動（別ターミナル）
 
 ```bash
-docker-compose up
+docker-compose up -d
 ```
 
 初回起動時、MongoDB の準備に 10-15 秒かかります。ログで確認してください。
@@ -83,7 +131,7 @@ npm run dev
 
 以下の URL でアクセス可能：
 - **フロントエンド**: http://localhost:5173
-- **バックエンド**: http://localhost:5000/api/health
+- **バックエンド**: http://localhost:5001/api/health
 
 ### 3. サンプルデータ投入（オプション）
 
@@ -194,6 +242,14 @@ GET /api/expenses/summary/:month
 
 ## トラブルシューティング
 
+### ポート5000の競合でサーバが起動しない（EADDRINUSE）
+macOS のシステムプロセスが `:5000` を占有する場合があります。`server/.env` の `PORT=5001` を使用してください。
+
+```bash
+# 何が5000を使用しているか確認
+lsof -iTCP:5000 -sTCP:LISTEN
+```
+
 ### MongoDB に接続できない
 ```bash
 # Docker が起動しているか確認
@@ -205,6 +261,10 @@ docker-compose logs mongodb
 # 再起動
 docker-compose restart mongodb
 ```
+
+認証なしのローカルMongoDBを使う場合は、以下のいずれかを選択：
+- server/.env の `MONGO_URI` を `mongodb://localhost:27017/pocket_insight` に変更（Dockerのmongoを使わない）
+- もしくは docker-compose.yml の `MONGO_INITDB_ROOT_USERNAME/PASSWORD` を削除（非推奨）
 
 ### ポート競合エラー
 別プロセスがポート 5173, 5000, 27017 を使用している場合、以下で確認：

@@ -3,7 +3,7 @@ import axios from 'axios';
 import { CATEGORIES } from '../constants/categories';
 import '../styles/ExpenseForm.css';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:5001/api';
 
 interface ExpenseFormProps {
   onExpenseAdded: () => void;
