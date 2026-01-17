@@ -50,7 +50,7 @@
 
 ```bash
 # 1) クローン & 依存インストール
-git clone https://github.com/fermentedsoybean7110/react_sample_app.git pocket-insight
+git clone https://github.com/fermentedsoybean7110/pocket_insight.git pocket-insight
 cd pocket-insight
 npm run install:all
 
@@ -183,7 +183,7 @@ pocket-insight/
 │   └── index.html
 │
 ├── server/                 # Express バックエンド (TS)
-│   ├── src/
+git clone https://github.com/fermentedsoybean7110/pocket_insight.git pocket-insight
 │   │   ├── controllers/   # ビジネスロジック
 │   │   ├── models/        # Mongoose スキーマ
 │   │   ├── routes/        # API ルータ
